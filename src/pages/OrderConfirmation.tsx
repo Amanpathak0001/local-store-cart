@@ -1,17 +1,16 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Order } from "@/types";
 import { CheckCircle, ArrowRight } from "lucide-react";
+import { convertUSDToINR, formatCurrency } from "@/utils/currencyConverter";
 
 const OrderConfirmation = () => {
   const navigate = useNavigate();
   const [order, setOrder] = useState<Order | null>(null);
   
   useEffect(() => {
-    // Get the last order from localStorage
     const lastOrderString = localStorage.getItem("lastOrder");
     if (lastOrderString) {
       try {
@@ -21,7 +20,6 @@ const OrderConfirmation = () => {
         console.error("Error parsing last order", error);
       }
     } else {
-      // Redirect if no order is found
       navigate("/");
     }
   }, [navigate]);
@@ -88,8 +86,13 @@ const OrderConfirmation = () => {
                     <p className="font-medium">{item.product.name}</p>
                     <p className="text-gray-600">Quantity: {item.quantity}</p>
                   </div>
-                  <div className="text-right font-medium">
-                    ${(item.product.price * item.quantity).toFixed(2)}
+                  <div className="text-right">
+                    <div className="font-medium">
+                      {formatCurrency(item.product.price * item.quantity, 'USD')}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {formatCurrency(convertUSDToINR(item.product.price * item.quantity), 'INR')}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -98,7 +101,12 @@ const OrderConfirmation = () => {
             <div className="border-t pt-4 mt-4">
               <div className="flex justify-between font-bold text-lg">
                 <span>Total:</span>
-                <span>${order.total.toFixed(2)}</span>
+                <div className="flex flex-col items-end">
+                  <span>{formatCurrency(order.total, 'USD')}</span>
+                  <span className="text-sm text-gray-600">
+                    {formatCurrency(convertUSDToINR(order.total), 'INR')}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProductById } from "@/data/products";
@@ -9,6 +8,7 @@ import { ShoppingCart, Star, ChevronLeft, Plus, Minus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import ProductCard from "@/components/ProductCard";
 import { products } from "@/data/products";
+import { convertUSDToINR, formatCurrency } from "@/utils/currencyConverter";
 
 const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +17,6 @@ const ProductPage = () => {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   
-  // Get related products (products in the same category)
   const relatedProducts = product 
     ? products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4) 
     : [];
@@ -59,7 +58,6 @@ const ProductPage = () => {
         </Button>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          {/* Product Image */}
           <div className="bg-gray-50 rounded-lg overflow-hidden">
             <img 
               src={product.image} 
@@ -68,7 +66,6 @@ const ProductPage = () => {
             />
           </div>
 
-          {/* Product Info */}
           <div className="flex flex-col">
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
             
@@ -84,7 +81,14 @@ const ProductPage = () => {
               <span className="ml-2 text-gray-600">{product.rating} / 5</span>
             </div>
             
-            <p className="text-3xl font-bold mb-6">${product.price.toFixed(2)}</p>
+            <div className="flex items-center mb-6">
+              <span className="text-3xl font-bold mr-4">
+                {formatCurrency(product.price, 'USD')}
+              </span>
+              <span className="text-xl text-gray-600">
+                {formatCurrency(convertUSDToINR(product.price), 'INR')}
+              </span>
+            </div>
             
             <div className="mb-6">
               <h3 className="font-medium mb-2">Description</h3>
@@ -144,7 +148,6 @@ const ProductPage = () => {
           </div>
         </div>
         
-        {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div className="mt-16">
             <Separator className="mb-8" />

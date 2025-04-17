@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { useCart } from "@/context/CartContext";
@@ -6,10 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Trash, Plus, Minus, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
+import { convertUSDToINR, formatCurrency } from "@/utils/currencyConverter";
 
 const CartPage = () => {
   const { cartItems, updateQuantity, removeFromCart, totalItems, totalPrice } = useCart();
   const navigate = useNavigate();
+  const taxAmount = totalPrice * 0.1;
+  const total = totalPrice + taxAmount;
   
   if (cartItems.length === 0) {
     return (
@@ -39,7 +41,6 @@ const CartPage = () => {
         <h1 className="text-3xl font-bold mb-8">Your Shopping Cart</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {cartItems.map((item) => (
               <div key={item.product.id} className="flex flex-col sm:flex-row border rounded-lg p-4 relative">
@@ -83,8 +84,13 @@ const CartPage = () => {
                         <Plus className="h-4 w-4" />
                       </button>
                     </div>
-                    <div className="font-bold">
-                      ${(item.product.price * item.quantity).toFixed(2)}
+                    <div className="flex flex-col">
+                      <div className="font-bold">
+                        {formatCurrency(item.product.price * item.quantity, 'USD')}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {formatCurrency(convertUSDToINR(item.product.price * item.quantity), 'INR')}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -92,7 +98,6 @@ const CartPage = () => {
             ))}
           </div>
           
-          {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="border rounded-lg p-6 sticky top-24">
               <h2 className="text-xl font-bold mb-4">Order Summary</h2>
@@ -101,7 +106,12 @@ const CartPage = () => {
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal ({totalItems} items)</span>
-                  <span>${totalPrice.toFixed(2)}</span>
+                  <div className="flex flex-col items-end">
+                    <span>{formatCurrency(totalPrice, 'USD')}</span>
+                    <span className="text-sm text-gray-600">
+                      {formatCurrency(convertUSDToINR(totalPrice), 'INR')}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping</span>
@@ -109,7 +119,12 @@ const CartPage = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tax</span>
-                  <span>${(totalPrice * 0.1).toFixed(2)}</span>
+                  <div className="flex flex-col items-end">
+                    <span>{formatCurrency(taxAmount, 'USD')}</span>
+                    <span className="text-sm text-gray-600">
+                      {formatCurrency(convertUSDToINR(taxAmount), 'INR')}
+                    </span>
+                  </div>
                 </div>
               </div>
               
@@ -117,7 +132,12 @@ const CartPage = () => {
               
               <div className="flex justify-between font-bold text-lg mb-6">
                 <span>Total</span>
-                <span>${(totalPrice + totalPrice * 0.1).toFixed(2)}</span>
+                <div className="flex flex-col items-end">
+                  <span>{formatCurrency(total, 'USD')}</span>
+                  <span className="text-sm text-gray-600">
+                    {formatCurrency(convertUSDToINR(total), 'INR')}
+                  </span>
+                </div>
               </div>
               
               <Button 

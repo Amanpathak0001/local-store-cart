@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Star } from "lucide-react";
+import { convertUSDToINR, formatCurrency } from "@/utils/currencyConverter";
 
 interface ProductCardProps {
   product: Product;
@@ -44,7 +45,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
           <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
           <div className="flex justify-between items-center mt-auto">
-            <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
+            <div>
+              <span className="font-bold text-lg mr-2">
+                {formatCurrency(product.price, 'USD')}
+              </span>
+              <span className="text-sm text-gray-600">
+                {formatCurrency(convertUSDToINR(product.price), 'INR')}
+              </span>
+            </div>
             <Button 
               size="sm" 
               onClick={handleAddToCart}
